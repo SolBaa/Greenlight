@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+  api:
+    image: greenlight
+    build: 
+      context: .
+      target: build
+    command: gowatch
+    volumes:
+      - ./:/go/src/github.com/solbaa/greenlight
+    ports:
+      - 8080:8080
+    env_file: .env
+    depends_on:
+      - db
+  db:
+    image: 'postgres:latest'
+    ports:
+      - 9920:5432
+    environment:
+      - POSTGRES_DB=gorm
+      - POSTGRES_USER=gorm
+      - POSTGRES_PASSWORD=gorm
+ 
+
+volumes:
+  postgres-data:
+    external: false
