@@ -13,7 +13,8 @@ import (
 
 func main() {
 	var cfg handlers.Config
-	flag.IntVar(&cfg.Port, "port", 4000, "API server port")
+	var appl handlers.Application
+	flag.IntVar(&cfg.Port, "port", 8000, "API server port")
 
 	flag.StringVar(&cfg.Env, "env", "development", "Environment(development|staging|production)")
 	flag.Parse()
@@ -28,7 +29,7 @@ func main() {
 	mux.HandleFunc("/v1/healthcheck", app.HealthcheckHandler)
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Port),
-		Handler:      mux,
+		Handler:      appl.Routes(),
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 30 * time.Second,
