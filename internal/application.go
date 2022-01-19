@@ -1,12 +1,12 @@
 package internal
 
-import (
-	"fmt"
+// import (
+// 	"fmt"
 
-	"github.com/SolBaa/Greenlight/cmd/handlers"
-)
+// 	"github.com/SolBaa/Greenlight/cmd/handlers"
+// )
 
-func hola() {
-	fmt.Println(handlers.Version)
+// func hola() {
+// 	fmt.Println(handlers.Version)
 
-}
+// }
