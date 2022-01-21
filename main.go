@@ -11,6 +11,16 @@ import (
 	"github.com/SolBaa/Greenlight/cmd/handlers"
 )
 
+type Config struct {
+	Port int
+	Env  string
+}
+
+type Application struct {
+	Config Config
+	Logger *log.Logger
+}
+
 func main() {
 	var cfg handlers.Config
 	var appl handlers.Application

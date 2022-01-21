@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	cerror "github.com/SolBaa/Greenlight/pkg/error"
 	"github.com/SolBaa/Greenlight/pkg/validations"
 )
 
@@ -25,9 +26,9 @@ func (app *Application) HealthcheckHandler(w http.ResponseWriter, r *http.Reques
 		"environment": app.Config.Env,
 		"version":     Version,
 	}
-	err := validations.WriteJSON(w, http.StatusOK, data, nil)
+	err := validations.WriteJSON(w, http.StatusOK, validations.Envelope{"data": data}, nil)
 	if err != nil {
-		app.Logger.Println(err)
-		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+		cerror.ServerErrorResponse(w, r, err)
 	}
+
 }

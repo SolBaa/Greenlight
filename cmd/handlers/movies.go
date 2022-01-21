@@ -3,7 +3,9 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/SolBaa/Greenlight/internal/data"
 	"github.com/SolBaa/Greenlight/pkg/validations"
 )
 
@@ -18,5 +20,17 @@ func (app *Application) ShowMovieHandler(w http.ResponseWriter, r *http.Request)
 		http.NotFound(w, r)
 		return
 	}
-	fmt.Fprintf(w, "show the details of movie %d\n", id)
+	movie := data.Movie{
+		ID:        id,
+		CreatedAt: time.Now(),
+		Title:     "Casablanca",
+		Runtime:   102,
+		Genres:    []string{"drama", "romance", "war"},
+		Version:   1,
+	}
+	err = validations.WriteJSON(w, http.StatusOK, validations.Envelope{"movie": movie}, nil)
+	if err != nil {
+		app.Logger.Println(err)
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
 }
