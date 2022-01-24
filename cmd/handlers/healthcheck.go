@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	cerror "github.com/SolBaa/Greenlight/pkg/error"
-	"github.com/SolBaa/Greenlight/pkg/validations"
+	"github.com/SolBaa/Greenlight/pkg/utils"
 )
 
 const Version = "1.0.0"
@@ -13,8 +13,10 @@ const Version = "1.0.0"
 type Config struct {
 	Port int
 	Env  string
+	DB   struct {
+		DSN string
+	}
 }
-
 type Application struct {
 	Config Config
 	Logger *log.Logger
@@ -26,7 +28,7 @@ func (app *Application) HealthcheckHandler(w http.ResponseWriter, r *http.Reques
 		"environment": app.Config.Env,
 		"version":     Version,
 	}
-	err := validations.WriteJSON(w, http.StatusOK, validations.Envelope{"data": data}, nil)
+	err := utils.WriteJSON(w, http.StatusOK, utils.Envelope{"data": data}, nil)
 	if err != nil {
 		cerror.ServerErrorResponse(w, r, err)
 	}

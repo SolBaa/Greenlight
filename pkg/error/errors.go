@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/SolBaa/Greenlight/pkg/validations"
+	"github.com/SolBaa/Greenlight/pkg/utils"
 )
 
 type Config struct {
@@ -18,7 +18,7 @@ type app struct {
 	Logger *log.Logger
 }
 
-// The logError() method is a generic helper for logging an error message. Later in the
+// The logError() method is a generic utils for logging an error message. Later in the
 // book we'll upgrade this to use structured logging, and record additional information
 // about the request including the HTTP method and URL.
 func LogError(r *http.Request, err error) {
@@ -26,17 +26,17 @@ func LogError(r *http.Request, err error) {
 
 }
 
-// The errorResponse() method is a generic helper for sending JSON-formatted error
+// The errorResponse() method is a generic utils for sending JSON-formatted error
 // messages to the client with a given status code. Note that we're using an interface{}
 // type for the message parameter, rather than just a string type, as this gives us
 // more flexibility over the values that we can include in the response.
 func ErrorResponse(w http.ResponseWriter, r *http.Request, status int, message interface{}) {
-	env := validations.Envelope{"error": message}
-	// Write the response using the writeJSON() helper. If this happens to return an
+	env := utils.Envelope{"error": message}
+	// Write the response using the writeJSON() utils. If this happens to return an
 	// error then log it, and fall back to sending the client an empty response with a
 	// 500 Internal Server Error status code.
 
-	err := validations.WriteJSON(w, status, env, nil)
+	err := utils.WriteJSON(w, status, env, nil)
 	if err != nil {
 		w.WriteHeader(500)
 	}
@@ -44,7 +44,7 @@ func ErrorResponse(w http.ResponseWriter, r *http.Request, status int, message i
 
 // The serverErrorResponse() method will be used when our Application encounters an
 // unexpected problem at runtime. It logs the detailed error message, then uses the
-// errorResponse() helper to send a 500 Internal Server Error status code and JSON
+// errorResponse() utils to send a 500 Internal Server Error status code and JSON
 // response (containing a generic error message) to the client.
 func ServerErrorResponse(w http.ResponseWriter, r *http.Request, err error) {
 
@@ -64,4 +64,12 @@ func NotFoundResponse(w http.ResponseWriter, r *http.Request) {
 func MethodNotAllowedResponse(w http.ResponseWriter, r *http.Request) {
 	message := fmt.Sprintf("the %s method is not supported for this resource", r.Method)
 	ErrorResponse(w, r, http.StatusMethodNotAllowed, message)
+}
+
+func BadRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
+	ErrorResponse(w, r, http.StatusBadRequest, err.Error())
+}
+
+func FailedValidationResponse(w http.ResponseWriter, r *http.Request, errors map[string]string) {
+	ErrorResponse(w, r, http.StatusUnprocessableEntity, errors)
 }

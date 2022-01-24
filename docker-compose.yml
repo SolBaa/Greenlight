@@ -18,9 +18,9 @@ services:
     ports:
       - 9920:5432
     environment:
-      - POSTGRES_DB=gorm
-      - POSTGRES_USER=gorm
-      - POSTGRES_PASSWORD=gorm
+      - POSTGRES_DB=greenlight
+      - POSTGRES_USER=greenlight
+      - POSTGRES_PASSWORD=pa55word
  
 
 volumes:
