@@ -1,4 +1,4 @@
-# Build Image
+
 FROM golang:1.16.5-alpine3.13 as build
 
 
@@ -21,6 +21,6 @@ ENV SERVICE_NAME=greenlight
 ENV BUILDER_APP_DIR=/go/src/github.com/solbaa/${SERVICE_NAME}
 WORKDIR /app
 COPY --from=build ${BUILDER_APP_DIR}/${SERVICE_NAME} .
-COPY --from=build ${BUILDER_APP_DIR}/db ./migrations/
+COPY --from=build ${BUILDER_APP_DIR} ./migrations/
 
 ENTRYPOINT ["./marvik"]

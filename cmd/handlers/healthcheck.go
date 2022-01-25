@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/SolBaa/Greenlight/internal/data"
 	cerror "github.com/SolBaa/Greenlight/pkg/error"
 	"github.com/SolBaa/Greenlight/pkg/utils"
 )
@@ -20,6 +21,7 @@ type Config struct {
 type Application struct {
 	Config Config
 	Logger *log.Logger
+	Models data.Models
 }
 
 func (app *Application) HealthcheckHandler(w http.ResponseWriter, r *http.Request) {

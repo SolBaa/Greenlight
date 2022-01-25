@@ -10,22 +10,29 @@ import (
 	"os"
 	"time"
 
-	"github.com/SolBaa/Greenlight/cmd/handlers"
+	"github.com/SolBaa/Greenlight/cmd/handlers" // New import
+	"github.com/SolBaa/Greenlight/internal/data"
+
+	// New import
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 )
 
-type Config struct {
-	Port int
-	Env  string
-	db   struct {
-		dsn string
-	}
-}
+// type Config struct {
+// 	Port int
+// 	Env  string
+// 	db   struct {
+// 		dsn string
+// 	}
+// }
 
-type Application struct {
-	Config Config
-	Logger *log.Logger
-}
+// type Application struct {
+// 	Config Config
+// 	Logger *log.Logger
+// }
 
 func main() {
 	var cfg handlers.Config
@@ -37,10 +44,6 @@ func main() {
 	flag.Parse()
 
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
-	app := &handlers.Application{
-		Config: cfg,
-		Logger: logger,
-	}
 	db, err := openDB(cfg)
 	if err != nil {
 		logger.Fatal(err)
@@ -52,7 +55,27 @@ func main() {
 	// established.
 	logger.Printf("database connection pool established")
 
+	migrationDriver, err := postgres.WithInstance(db, &postgres.Config{})
+	if err != nil {
+		logger.Fatal(err, nil)
+	}
+	migrator, err := migrate.NewWithDatabaseInstance("./migrations", "postgres", migrationDriver)
+	if err != nil {
+		logger.Fatal(err, nil)
+	}
+	err = migrator.Up()
+	if err != nil && err != migrate.ErrNoChange {
+		logger.Fatal(err, nil)
+	}
+	logger.Printf("database migrations applied")
+
 	mux := http.NewServeMux()
+
+	app := &handlers.Application{
+		Config: cfg,
+		Logger: logger,
+		Models: data.NewModels(db),
+	}
 	mux.HandleFunc("/v1/healthcheck", app.HealthcheckHandler)
 	srv := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.Port),
